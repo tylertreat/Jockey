@@ -46,6 +46,7 @@ import java.util.List;
 public class AppEngineAuthenticator implements Authenticator {
 
     private static final String TOKEN_TYPE = "ah";
+    private static final String AUTH_URL = "/_ah/login?continue=http://localhost/&auth=";
 
     private Account mAccount;
     private AccountManager mAccountManager;
@@ -115,7 +116,7 @@ public class AppEngineAuthenticator implements Authenticator {
             // Bind custom cookie store to the local context
             localContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
 
-            HttpGet get = new HttpGet(mUrl + "/_ah/login?continue=http://localhost/&auth=" + tokens[0]);
+            HttpGet get = new HttpGet(mUrl + AUTH_URL + tokens[0]);
 
             try {
                 HttpResponse response = mHttpClient.execute(get, localContext);
