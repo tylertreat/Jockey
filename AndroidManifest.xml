@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.clarionmedia.jockey"
+          android:versionCode="1"
+          android:versionName="1.0" >
+
+    <!-- Jockey is never compiled as an APK but rather used as a library. -->
+    <uses-sdk android:minSdkVersion="10" />
+
+</manifest>
