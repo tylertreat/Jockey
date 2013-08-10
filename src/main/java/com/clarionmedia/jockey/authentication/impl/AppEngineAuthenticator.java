@@ -18,8 +18,10 @@ package com.clarionmedia.jockey.authentication.impl;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.accounts.AccountManagerCallback;
 import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
 import com.clarionmedia.jockey.authentication.Authenticator;
 import com.clarionmedia.jockey.authentication.OnAuthenticationListener;
 import org.apache.http.client.HttpClient;
@@ -43,6 +45,7 @@ public class AppEngineAuthenticator implements Authenticator {
     private HttpClient mHttpClient;
     private Activity mPromptActivity;
     private Context mContext;
+    private AccountManagerCallback<Bundle> mAuthCallback;
 
     public AppEngineAuthenticator(Context context, AccountManager accountManager, Account account,
                                   HttpClient httpClient, String url, Activity promptActivity) {
@@ -53,6 +56,7 @@ public class AppEngineAuthenticator implements Authenticator {
         mHttpClient = httpClient;
         mPromptActivity = promptActivity;
         mContext = context.getApplicationContext();
+        mAuthCallback = new AppEngineAuthTokenCallback(mContext, this);
 
         // Don't follow redirects
         mHttpClient.getParams().setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, false);
@@ -61,11 +65,9 @@ public class AppEngineAuthenticator implements Authenticator {
     @Override
     public void authenticate() {
         if (mPromptActivity != null) {
-            mAccountManager.getAuthToken(mAccount, TOKEN_TYPE, null, mPromptActivity,
-                    new AppEngineAuthTokenCallback(mContext, this), null);
+            mAccountManager.getAuthToken(mAccount, TOKEN_TYPE, null, mPromptActivity, mAuthCallback, null);
         } else {
-            mAccountManager.getAuthToken(mAccount, TOKEN_TYPE, false,
-                    new AppEngineAuthTokenCallback(mContext, this), null);
+            mAccountManager.getAuthToken(mAccount, TOKEN_TYPE, false, mAuthCallback, null);
         }
     }
 
@@ -87,6 +89,14 @@ public class AppEngineAuthenticator implements Authenticator {
     @Override
     public synchronized void registerOnAuthenticationListener(OnAuthenticationListener authenticationListener) {
         mAuthenticationListeners.add(authenticationListener);
+    }
+
+    public void setPromptActivity(Activity promptActivity) {
+        mPromptActivity = promptActivity;
+    }
+
+    public void setAuthCallback(AccountManagerCallback<Bundle> callback) {
+        mAuthCallback = callback;
     }
 
 }
