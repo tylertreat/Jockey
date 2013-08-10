@@ -18,6 +18,8 @@ package com.clarionmedia.jockey.authentication.impl;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.Activity;
+import android.content.Context;
 import com.clarionmedia.jockey.authentication.Authenticator;
 import com.clarionmedia.jockey.authentication.OnAuthenticationListener;
 import org.apache.http.client.HttpClient;
@@ -39,13 +41,18 @@ public class AppEngineAuthenticator implements Authenticator {
     private String mUrl;
     private List<OnAuthenticationListener> mAuthenticationListeners;
     private HttpClient mHttpClient;
+    private Activity mPromptActivity;
+    private Context mContext;
 
-    public AppEngineAuthenticator(AccountManager accountManager, Account account, HttpClient httpClient, String url) {
+    public AppEngineAuthenticator(Context context, AccountManager accountManager, Account account,
+                                  HttpClient httpClient, String url, Activity promptActivity) {
         mAccount = account;
         mAccountManager = accountManager;
         mUrl = url;
         mAuthenticationListeners = new ArrayList<OnAuthenticationListener>();
         mHttpClient = httpClient;
+        mPromptActivity = promptActivity;
+        mContext = context.getApplicationContext();
 
         // Don't follow redirects
         mHttpClient.getParams().setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, false);
@@ -53,7 +60,13 @@ public class AppEngineAuthenticator implements Authenticator {
 
     @Override
     public void authenticate() {
-        mAccountManager.getAuthToken(mAccount, TOKEN_TYPE, false, new GetAuthTokenCallback(this), null);
+        if (mPromptActivity != null) {
+            mAccountManager.getAuthToken(mAccount, TOKEN_TYPE, null, mPromptActivity,
+                    new AppEngineAuthTokenCallback(mContext, this), null);
+        } else {
+            mAccountManager.getAuthToken(mAccount, TOKEN_TYPE, false,
+                    new AppEngineAuthTokenCallback(mContext, this), null);
+        }
     }
 
     @Override

@@ -17,6 +17,7 @@
 package com.clarionmedia.jockey.authentication.impl;
 
 import android.accounts.*;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -35,12 +36,16 @@ import org.apache.http.protocol.HttpContext;
 
 import java.io.IOException;
 
-public class GetAuthTokenCallback implements AccountManagerCallback<Bundle> {
+public class AppEngineAuthTokenCallback implements AccountManagerCallback<Bundle> {
+
+    private static final String AUTH_COOKIE = "ACSID";
 
     private Authenticator mAuthenticator;
+    private Context mContext;
 
-    public GetAuthTokenCallback(Authenticator authenticator) {
+    public AppEngineAuthTokenCallback(Context context, Authenticator authenticator) {
         mAuthenticator = authenticator;
+        mContext = context.getApplicationContext();
     }
 
     public void run(AccountManagerFuture result) {
@@ -48,8 +53,8 @@ public class GetAuthTokenCallback implements AccountManagerCallback<Bundle> {
             Bundle bundle = (Bundle) result.getResult();
             Intent intent = (Intent) bundle.get(AccountManager.KEY_INTENT);
             if (intent != null) {
-                // TODO: User input required
-                return;
+                // User input required
+                mContext.startActivity(intent);
             } else {
                 onGetAuthToken(bundle);
             }
@@ -90,8 +95,9 @@ public class GetAuthTokenCallback implements AccountManagerCallback<Bundle> {
                     return null;
 
                 for (Cookie cookie : cookieStore.getCookies()) {
-                    if (cookie.getName().equals("ACSID"))
+                    if (cookie.getName().equals(AUTH_COOKIE)) {
                         return cookie;
+                    }
                 }
             } catch (ClientProtocolException e) {
                 // TODO Auto-generated catch block
