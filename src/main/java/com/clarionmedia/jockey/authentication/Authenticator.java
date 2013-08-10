@@ -16,11 +16,23 @@
 
 package com.clarionmedia.jockey.authentication;
 
+import org.apache.http.client.HttpClient;
+
+import java.util.List;
+
 /**
  * Responsible for obtaining an authentication cookie from the server.
  */
 public interface Authenticator {
 
     void authenticate();
+
+    void registerOnAuthenticationListener(OnAuthenticationListener authenticationListener);
+
+    List<OnAuthenticationListener> getOnAuthenticationListeners();
+
+    HttpClient getHttpClient();
+
+    String getAuthUrl(String token);
 
 }
