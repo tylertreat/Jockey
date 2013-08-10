@@ -20,6 +20,17 @@ import org.apache.http.cookie.Cookie;
 
 public interface OnAuthenticationListener {
 
-    void onAuthentication(Cookie authenticationCookie);
+    /**
+     * Hook to be called when authentication with the server is successful.
+     *
+     * @param authenticationCookie the authentication {@link Cookie} returned by the server or {@code null} if there
+     *                             isn't one
+     */
+    void onAuthenticationSuccess(Cookie authenticationCookie);
+
+    /**
+     * Hook to be called when authentication with the server fails.
+     */
+    void onAuthenticationFailed();
 
 }

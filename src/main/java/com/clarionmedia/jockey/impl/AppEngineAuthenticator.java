@@ -141,12 +141,21 @@ public class AppEngineAuthenticator implements Authenticator {
 
         protected void onPostExecute(Cookie cookie) {
             if (cookie == null) {
-                return;
+                notifyListenersFailed();
+            } else {
+                notifyListenersSuccess(cookie);
             }
+        }
 
-            // Notify authentication listeners
+        private void notifyListenersSuccess(Cookie cookie) {
             for (OnAuthenticationListener listener : mAuthenticationListeners) {
-                listener.onAuthentication(cookie);
+                listener.onAuthenticationSuccess(cookie);
+            }
+        }
+
+        private void notifyListenersFailed() {
+            for (OnAuthenticationListener listener : mAuthenticationListeners) {
+                listener.onAuthenticationFailed();
             }
         }
 
