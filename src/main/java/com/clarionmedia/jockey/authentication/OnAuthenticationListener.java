@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.clarionmedia.jockey;
+package com.clarionmedia.jockey.authentication;
 
 import org.apache.http.cookie.Cookie;
 

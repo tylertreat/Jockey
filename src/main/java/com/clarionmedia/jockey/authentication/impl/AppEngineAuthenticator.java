@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.clarionmedia.jockey.impl;
+package com.clarionmedia.jockey.authentication.impl;
 
 import android.accounts.*;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import com.clarionmedia.jockey.Authenticator;
-import com.clarionmedia.jockey.OnAuthenticationListener;
+import com.clarionmedia.jockey.authentication.Authenticator;
+import com.clarionmedia.jockey.authentication.OnAuthenticationListener;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CookieStore;
@@ -41,7 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Implementation of {@link com.clarionmedia.jockey.Authenticator} for Google App Engine.
+ * Implementation of {@link com.clarionmedia.jockey.authentication.Authenticator} for Google App Engine.
  */
 public class AppEngineAuthenticator implements Authenticator {
 
