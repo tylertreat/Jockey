@@ -22,15 +22,16 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import com.clarionmedia.jockey.authentication.Authenticator;
+import com.clarionmedia.jockey.authentication.CookieStoreProvider;
 import com.clarionmedia.jockey.authentication.OnAuthenticationListener;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CookieStore;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.cookie.Cookie;
-import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
@@ -42,10 +43,13 @@ public class AppEngineAuthTokenCallback implements AccountManagerCallback<Bundle
 
     private Authenticator mAuthenticator;
     private Context mContext;
+    private CookieStoreProvider mCookieStoreProvider;
 
-    public AppEngineAuthTokenCallback(Context context, Authenticator authenticator) {
+    public AppEngineAuthTokenCallback(Context context, CookieStoreProvider cookieStoreProvider,
+                                      Authenticator authenticator) {
         mAuthenticator = authenticator;
         mContext = context.getApplicationContext();
+        mCookieStoreProvider = cookieStoreProvider;
     }
 
     public void run(AccountManagerFuture result) {
@@ -56,7 +60,7 @@ public class AppEngineAuthTokenCallback implements AccountManagerCallback<Bundle
                 // User input required
                 mContext.startActivity(intent);
             } else {
-                onGetAuthToken(bundle);
+                onGetAuthToken(bundle, mCookieStoreProvider);
             }
         } catch (OperationCanceledException e) {
             // TODO Auto-generated catch block
@@ -70,16 +74,22 @@ public class AppEngineAuthTokenCallback implements AccountManagerCallback<Bundle
         }
     }
 
-    protected void onGetAuthToken(Bundle bundle) {
+    protected void onGetAuthToken(Bundle bundle, CookieStoreProvider cookieStoreProvider) {
         String auth_token = bundle.getString(AccountManager.KEY_AUTHTOKEN);
-        new GetCookieTask().execute(auth_token);
+        new GetCookieTask(cookieStoreProvider).execute(auth_token);
     }
 
     private class GetCookieTask extends AsyncTask<String, String, Cookie> {
 
+        private CookieStoreProvider mCookieStoreProvider;
+
+        public GetCookieTask(CookieStoreProvider cookieStoreProvider) {
+            mCookieStoreProvider = cookieStoreProvider;
+        }
+
         protected Cookie doInBackground(String... tokens) {
             // Create a local instance of cookie store
-            CookieStore cookieStore = new BasicCookieStore();
+            CookieStore cookieStore = mCookieStoreProvider.getNewCookieStore();
 
             // Create local HTTP context
             HttpContext localContext = new BasicHttpContext();
@@ -87,9 +97,13 @@ public class AppEngineAuthTokenCallback implements AccountManagerCallback<Bundle
             localContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
 
             HttpGet get = new HttpGet(mAuthenticator.getAuthUrl(tokens[0]));
+            HttpClient httpClient = mAuthenticator.getHttpClient();
+
+            // Don't follow redirects
+            httpClient.getParams().setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, false);
 
             try {
-                HttpResponse response = mAuthenticator.getHttpClient().execute(get, localContext);
+                HttpResponse response = httpClient.execute(get, localContext);
                 if (response.getStatusLine().getStatusCode() != 302)
                     // Response should be a redirect
                     return null;

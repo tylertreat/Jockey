@@ -23,9 +23,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import com.clarionmedia.jockey.authentication.Authenticator;
+import com.clarionmedia.jockey.authentication.CookieStoreProvider;
 import com.clarionmedia.jockey.authentication.OnAuthenticationListener;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.params.ClientPNames;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,10 +56,8 @@ public class AppEngineAuthenticator implements Authenticator {
         mHttpClient = httpClient;
         mPromptActivity = promptActivity;
         mContext = context.getApplicationContext();
-        mAuthCallback = new AppEngineAuthTokenCallback(mContext, this);
-
-        // Don't follow redirects
-        mHttpClient.getParams().setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, false);
+        mAuthCallback = new AppEngineAuthTokenCallback(mContext,
+                new CookieStoreProvider.DefaultCookieStoreProvider(), this);
     }
 
     @Override
