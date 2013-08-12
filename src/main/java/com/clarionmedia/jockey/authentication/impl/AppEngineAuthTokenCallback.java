@@ -75,8 +75,7 @@ public class AppEngineAuthTokenCallback implements AccountManagerCallback<Bundle
     }
 
     protected void onGetAuthToken(Bundle bundle, CookieStoreProvider cookieStoreProvider) {
-        String auth_token = bundle.getString(AccountManager.KEY_AUTHTOKEN);
-        new GetCookieTask(cookieStoreProvider).execute(auth_token);
+        new GetCookieTask(cookieStoreProvider).execute(bundle.getString(AccountManager.KEY_AUTHTOKEN));
     }
 
     private class GetCookieTask extends AsyncTask<String, String, Cookie> {
