@@ -18,10 +18,14 @@ package com.clarionmedia.jockey.authentication.impl;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.accounts.AccountManagerCallback;
 import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
+import android.os.Handler;
+import com.clarionmedia.jockey.authentication.OnAuthenticationListener;
 import com.xtremelabs.robolectric.RobolectricTestRunner;
-import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.params.HttpParams;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +33,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -46,16 +51,19 @@ public class AppEngineAuthenticatorTest {
     private Account mMockAccount;
 
     @Mock
-    private HttpClient mMockHttpClient;
+    private AbstractHttpClient mMockHttpClient;
 
     @Mock
     private Activity mMockActivity;
 
     @Mock
-    private AppEngineAuthTokenCallback mMockAuthTokenCallback;
+    private AppEngineAuthenticator.AppEngineAuthTokenCallback mMockAuthTokenCallback;
 
     @Mock
     private HttpParams mMockHttpParams;
+
+    @Mock
+    private OnAuthenticationListener mMockOnAuthenticationListener;
 
     private String mUrl = "foo";
 
@@ -65,37 +73,29 @@ public class AppEngineAuthenticatorTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         when(mMockContext.getApplicationContext()).thenReturn(mMockContext);
+        when(mMockContext.getSystemService(Context.ACCOUNT_SERVICE)).thenReturn(mMockAccountManager);
         when(mMockHttpClient.getParams()).thenReturn(mMockHttpParams);
-        mAppEngineAuthenticator = new AppEngineAuthenticator(mMockContext, mMockAccountManager, mMockAccount,
+        mAppEngineAuthenticator = new AppEngineAuthenticator(mMockContext, mMockAccount,
                 mMockHttpClient, mUrl, mMockActivity);
-        mAppEngineAuthenticator.setAuthCallback(mMockAuthTokenCallback);
     }
 
     @Test
     public void testAuthenticateWithPromptActivity() {
-        mAppEngineAuthenticator.authenticate();
+        mAppEngineAuthenticator.authenticateAsync();
 
         verify(mMockAccountManager)
-                .getAuthToken(mMockAccount, "ah", null, mMockActivity, mMockAuthTokenCallback, null);
+                .getAuthToken(any(Account.class), any(String.class), isNull(Bundle.class), any(Activity.class),
+                        any(AccountManagerCallback.class), isNull(Handler.class));
     }
 
     @Test
     public void testAuthenticateNoPromptActivity() {
         mAppEngineAuthenticator.setPromptActivity(null);
 
-        mAppEngineAuthenticator.authenticate();
+        mAppEngineAuthenticator.authenticateAsync();
 
-        verify(mMockAccountManager).getAuthToken(mMockAccount, "ah", false, mMockAuthTokenCallback, null);
-    }
-
-    @Test
-    public void testGetAuthUrl() {
-        String token = "bar";
-        String expected = mUrl + "/_ah/login?continue=http://localhost/&auth=" + token;
-
-        String actual = mAppEngineAuthenticator.getAuthUrl(token);
-
-        assertEquals("Auth URL should equal expected value", expected, actual);
+        verify(mMockAccountManager).getAuthToken(any(Account.class), any(String.class), any(Boolean.class),
+                any(AccountManagerCallback.class), isNull(Handler.class));
     }
 
 }

@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package com.clarionmedia.jockey.authentication;
+package com.clarionmedia.jockey;
 
-import org.apache.http.client.CookieStore;
-import org.apache.http.impl.client.BasicCookieStore;
+import com.clarionmedia.jockey.authentication.AuthenticationProvider;
 
-public interface CookieStoreProvider {
+public class Jockey {
 
-    CookieStore getNewCookieStore();
-
-    public static class DefaultCookieStoreProvider implements CookieStoreProvider {
-
-        @Override
-        public CookieStore getNewCookieStore() {
-            return new BasicCookieStore();
+    public static <T extends AuthenticationProvider> T to(Class<T> provider) {
+        try {
+            return provider.newInstance();
+        } catch (InstantiationException e) {
+            throw new RuntimeException("AuthenticationProvider must have a public zero-argument constructor");
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("AuthenticationProvider must have a public zero-argument constructor");
         }
-
     }
 
 }
