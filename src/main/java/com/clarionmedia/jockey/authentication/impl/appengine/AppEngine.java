@@ -26,18 +26,12 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 public class AppEngine extends AuthenticationProvider {
 
-    private String mUrl;
     private Account mAccount;
     private Activity mActivity;
 
-    public AppEngine() {
+    public AppEngine(String url) {
+        super(url);
         mHttpClient = new DefaultHttpClient();
-    }
-
-    @Override
-    public AppEngine at(String url) {
-        mUrl = url;
-        return this;
     }
 
     @Override
@@ -48,7 +42,6 @@ public class AppEngine extends AuthenticationProvider {
 
     @Override
     protected Authenticator buildAuthenticator(Context context) {
-        checkPreconditions(context);
         return new AppEngineAuthenticator(context.getApplicationContext(), mAccount, mHttpClient, mUrl, mActivity);
     }
 
@@ -62,18 +55,11 @@ public class AppEngine extends AuthenticationProvider {
         return this;
     }
 
-    private void checkPreconditions(Context context) {
-        if (context == null) {
-            throw new RuntimeException("Context must not be null");
-        }
+    @Override
+    protected void checkPreconditions(Context context) {
+        super.checkPreconditions(context);
         if (mAccount == null) {
             throw new RuntimeException("Account must not be null");
-        }
-        if (mHttpClient == null) {
-            throw new RuntimeException("HttpClient must not be null");
-        }
-        if (mUrl == null) {
-            throw new RuntimeException("URL must not be null");
         }
     }
 

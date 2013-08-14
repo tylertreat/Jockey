@@ -26,9 +26,13 @@ import java.lang.reflect.Proxy;
 
 public abstract class AuthenticationProvider {
 
+    protected String mUrl;
     protected AbstractHttpClient mHttpClient;
+    protected Authenticator mAuthenticator;
 
-    public abstract AuthenticationProvider at(String url);
+    public AuthenticationProvider(String url) {
+        mUrl = url;
+    }
 
     public abstract AuthenticationProvider promptConfirmationFrom(Activity activity);
 
@@ -40,17 +44,34 @@ public abstract class AuthenticationProvider {
     }
 
     public HttpClient now(Context context, OnAuthenticationListener onAuthenticationListener) {
-        Authenticator authenticator = buildAuthenticator(context);
-        authenticator.setOnAuthenticationListener(onAuthenticationListener);
+        checkPreconditions(context);
+        mAuthenticator = buildAuthenticator(context);
+        mAuthenticator.setOnAuthenticationListener(onAuthenticationListener);
 
-        authenticator.authenticateAsync();
+        mAuthenticator.authenticateAsync();
 
         return (HttpClient) Proxy.newProxyInstance(HttpClient.class.getClassLoader(),
-                new Class<?>[]{HttpClient.class}, new HttpClientProxy(authenticator));
+                new Class<?>[]{HttpClient.class}, new HttpClientProxy(mAuthenticator));
     }
 
     public HttpClient now(Context context) {
         return now(context, null);
+    }
+
+    public String getUrl() {
+        return mUrl;
+    }
+
+    protected void checkPreconditions(Context context) {
+        if (context == null) {
+            throw new RuntimeException("Context must not be null");
+        }
+        if (mHttpClient == null) {
+            throw new RuntimeException("HttpClient must not be null");
+        }
+        if (mUrl == null) {
+            throw new RuntimeException("URL must not be null");
+        }
     }
 
 }

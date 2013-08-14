@@ -18,20 +18,29 @@ package com.clarionmedia.jockey;
 
 import com.clarionmedia.jockey.authentication.AuthenticationProvider;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-public class Jockey {
+public final class Jockey {
 
-    private static List<AuthenticationProvider> sAuthProviderRegistry = new ArrayList<AuthenticationProvider>();
+    private static Map<String, AuthenticationProvider> sAuthProviderRegistry = new HashMap<String,
+            AuthenticationProvider>();
 
     public static synchronized <T extends AuthenticationProvider> T to(T provider) {
-        sAuthProviderRegistry.add(provider);
+        sAuthProviderRegistry.put(provider.getUrl(), provider);
         return provider;
     }
 
-    public static synchronized List<AuthenticationProvider> getAuthProviderRegistry() {
-        return new ArrayList<AuthenticationProvider>(sAuthProviderRegistry);
+    public static synchronized AuthenticationProvider getAuthProvider(String url) {
+        return sAuthProviderRegistry.get(url);
+    }
+
+    public static synchronized boolean hasAuthProvider(String url) {
+        return sAuthProviderRegistry.containsKey(url);
+    }
+
+    public static synchronized int getAuthProviderRegistrySize() {
+        return sAuthProviderRegistry.size();
     }
 
     public static synchronized void resetAuthProviderRegistry() {

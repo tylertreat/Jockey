@@ -26,6 +26,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @RunWith(RobolectricTestRunner.class)
 public class JockeyTest {
@@ -45,14 +49,69 @@ public class JockeyTest {
 
     @Test
     public void testTo() {
+        String url = "foo";
+        when(mMockAuthenticationProvider.getUrl()).thenReturn(url);
+
         AuthenticationProvider actual = Jockey.to(mMockAuthenticationProvider);
 
         assertEquals("AuthenticationProvider returned by to() should equal the provider passed in",
                 mMockAuthenticationProvider, actual);
         assertEquals("AuthProviderRegistry should contain the expected AuthenticationProvider", 1,
-                Jockey.getAuthProviderRegistry().size());
+                Jockey.getAuthProviderRegistrySize());
         assertEquals("AuthProviderRegistry should contain the expected AuthenticationProvider",
-                mMockAuthenticationProvider, Jockey.getAuthProviderRegistry().get(0));
+                mMockAuthenticationProvider, Jockey.getAuthProvider(url));
+    }
+
+    @Test
+    public void testGetAuthProvider() {
+        String url = "foo";
+        when(mMockAuthenticationProvider.getUrl()).thenReturn(url);
+        Jockey.to(mMockAuthenticationProvider);
+
+        AuthenticationProvider actual = Jockey.getAuthProvider(url);
+
+        assertEquals("AuthenticationProvider returned by getAuthProvider() should equal the expected provider",
+                mMockAuthenticationProvider, actual);
+    }
+
+    @Test
+    public void testHasAuthProvider_contains() {
+        String url = "foo";
+        when(mMockAuthenticationProvider.getUrl()).thenReturn(url);
+        Jockey.to(mMockAuthenticationProvider);
+
+        boolean actual = Jockey.hasAuthProvider(url);
+
+        assertTrue("hasAuthProvider() should have returned true", actual);
+    }
+
+    @Test
+    public void testHasAuthProvider_doesNotContain() {
+        String url = "foo";
+
+        boolean actual = Jockey.hasAuthProvider(url);
+
+        assertFalse("hasAuthProvider() should have returned false", actual);
+    }
+
+    @Test
+    public void testGetAuthProviderRegistrySize_empty() {
+        int actual = Jockey.getAuthProviderRegistrySize();
+
+        assertEquals("getAuthProviderRegistrySize should have returned 0", 0, actual);
+    }
+
+    @Test
+    public void testGetAuthProviderRegistrySize() {
+        when(mMockAuthenticationProvider.getUrl()).thenReturn("foo");
+        Jockey.to(mMockAuthenticationProvider);
+        AuthenticationProvider mockAuthProvider = mock(AuthenticationProvider.class);
+        when(mockAuthProvider.getUrl()).thenReturn("bar");
+        Jockey.to(mockAuthProvider);
+
+        int actual = Jockey.getAuthProviderRegistrySize();
+
+        assertEquals("getAuthProviderRegistrySize should have returned 2", 2, actual);
     }
 
     @Test
@@ -63,7 +122,7 @@ public class JockeyTest {
 
         Jockey.resetAuthProviderRegistry();
 
-        assertEquals("AuthProviderRegistry should be empty", 0, Jockey.getAuthProviderRegistry().size());
+        assertEquals("AuthProviderRegistry should be empty", 0, Jockey.getAuthProviderRegistrySize());
     }
 
 }
