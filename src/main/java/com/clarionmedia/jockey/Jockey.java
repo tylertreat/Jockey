@@ -18,16 +18,20 @@ package com.clarionmedia.jockey;
 
 import com.clarionmedia.jockey.authentication.AuthenticationProvider;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Jockey {
 
-    public static <T extends AuthenticationProvider> T to(Class<T> provider) {
-        try {
-            return provider.newInstance();
-        } catch (InstantiationException e) {
-            throw new RuntimeException("AuthenticationProvider must have a public zero-argument constructor");
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException("AuthenticationProvider must have a public zero-argument constructor");
-        }
+    private static List<AuthenticationProvider> sAuthProviderRegistry = new ArrayList<AuthenticationProvider>();
+
+    public static <T extends AuthenticationProvider> T to(T provider) {
+        sAuthProviderRegistry.add(provider);
+        return provider;
+    }
+
+    public static List<AuthenticationProvider> getAuthProviderRegistry() {
+        return sAuthProviderRegistry;
     }
 
 }
