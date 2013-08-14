@@ -21,7 +21,6 @@ import android.app.Activity;
 import android.content.Context;
 import com.clarionmedia.jockey.authentication.AuthenticationProvider;
 import com.clarionmedia.jockey.authentication.Authenticator;
-import com.clarionmedia.jockey.authentication.OnAuthenticationListener;
 import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 
