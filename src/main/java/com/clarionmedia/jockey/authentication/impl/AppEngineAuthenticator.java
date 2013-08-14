@@ -70,12 +70,16 @@ public class AppEngineAuthenticator implements Authenticator {
     }
 
     @Override
-    public void authenticateAsync() {
+    public AppEngineAuthFuture authenticateAsync() {
+        AccountManagerFuture<Bundle> future;
         if (mPromptActivity != null) {
-            mAccountManager.getAuthToken(mAccount, TOKEN_TYPE, null, mPromptActivity, mAuthTokenCallback, null);
+            future = mAccountManager.getAuthToken(mAccount, TOKEN_TYPE, null, mPromptActivity, mAuthTokenCallback,
+                    null);
         } else {
-            mAccountManager.getAuthToken(mAccount, TOKEN_TYPE, false, mAuthTokenCallback, null);
+            future = mAccountManager.getAuthToken(mAccount, TOKEN_TYPE, false, mAuthTokenCallback, null);
         }
+
+        return new AppEngineAuthFuture(future);
     }
 
     @Override

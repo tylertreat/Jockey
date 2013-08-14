@@ -17,22 +17,56 @@
 package com.clarionmedia.jockey.authentication;
 
 
+import android.os.Bundle;
 import org.apache.http.client.HttpClient;
 import org.apache.http.cookie.Cookie;
 
+import java.util.concurrent.Future;
+
 /**
- * Responsible for obtaining an authentication cookie from the server.
+ * {@code Authenticator} is responsible for performing authentication with the server. This is essentially a strategy
+ * pattern which facilitates authentication with a wide range of HTTP-compliant services.
  */
 public interface Authenticator {
 
-    void authenticateAsync();
+    /**
+     * Asynchronously authenticates with the server.
+     *
+     * @return {@link Future} which contains a handle to the authentication results
+     */
+    Future<Bundle> authenticateAsync();
 
+    /**
+     * Authenticates with the server in a blocking fashion.
+     *
+     * @return the authentication {@link Cookie} returned by the server if there is one
+     */
     Cookie authenticate();
 
+    /**
+     * Indicates if this {@code Authenticator} is currently authenticated with the server. When this returns {@code
+     * true}, this {@code Authenticator} should be able to successfully make requests to the server. If this returns
+     * {@code false}, subsequent requests may first make calls to {@link Authenticator#authenticate()} to perform the
+     * handshake.
+     *
+     * @return {@code true} if authenticated, {@code false} if not
+     */
     boolean isAuthenticated();
 
+    /**
+     * Sets the {@link OnAuthenticationListener} for this {@code Authenticator}. The {@code OnAuthenticationListener}
+     * hooks will be invoked when calls to {@link Authenticator#authenticate()} and {@link
+     * Authenticator#authenticateAsync()} complete.
+     *
+     * @param onAuthenticationListener the {@code OnAuthenticationListener} to use
+     */
     void setOnAuthenticationListener(OnAuthenticationListener onAuthenticationListener);
 
+    /**
+     * Returns the proxied {@link HttpClient} that is used to perform authenticated HTTP requests.
+     *
+     * @return {@link HttpClient}
+     */
     HttpClient getHttpClient();
 
 }
