@@ -26,11 +26,11 @@ public interface OnAuthenticationListener {
      * @param authenticationCookie the authentication {@link Cookie} returned by the server or {@code null} if there
      *                             isn't one
      */
-    void onAuthenticationSuccess(Cookie authenticationCookie);
+    void onAuthSuccess(Cookie authenticationCookie);
 
     /**
      * Hook to be called when authentication with the server fails.
      */
-    void onAuthenticationFailed();
+    void onAuthFailed();
 
 }

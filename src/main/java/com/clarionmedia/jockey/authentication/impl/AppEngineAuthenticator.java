@@ -224,12 +224,12 @@ public class AppEngineAuthenticator implements Authenticator {
             protected void onPostExecute(Cookie cookie) {
                 if (cookie == null) {
                     if (mOnAuthenticationListener != null) {
-                        mOnAuthenticationListener.onAuthenticationFailed();
+                        mOnAuthenticationListener.onAuthFailed();
                     }
                 } else {
                     persistAuthCookie(cookie);
                     if (mOnAuthenticationListener != null) {
-                        mOnAuthenticationListener.onAuthenticationSuccess(cookie);
+                        mOnAuthenticationListener.onAuthSuccess(cookie);
                     }
                 }
             }
