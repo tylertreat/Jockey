@@ -31,7 +31,7 @@ public final class HttpClientProxy implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (!mAuthenticator.isAuthenticated()) {
+        if (method.getName().equals("execute") && !mAuthenticator.isAuthenticated()) {
             mAuthenticator.authenticate();
         }
 
