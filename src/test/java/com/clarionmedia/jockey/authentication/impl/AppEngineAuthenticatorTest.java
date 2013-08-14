@@ -80,16 +80,15 @@ public class AppEngineAuthenticatorTest {
     }
 
     @Test
-    public void testAuthenticateWithPromptActivity() {
+    public void testAuthenticateAsyncWithPromptActivity() {
         mAppEngineAuthenticator.authenticateAsync();
 
-        verify(mMockAccountManager)
-                .getAuthToken(any(Account.class), any(String.class), isNull(Bundle.class), any(Activity.class),
-                        any(AccountManagerCallback.class), isNull(Handler.class));
+        verify(mMockAccountManager).getAuthToken(any(Account.class), any(String.class), isNull(Bundle.class),
+                any(Activity.class), any(AccountManagerCallback.class), isNull(Handler.class));
     }
 
     @Test
-    public void testAuthenticateNoPromptActivity() {
+    public void testAuthenticateAsyncNoPromptActivity() {
         mAppEngineAuthenticator.setPromptActivity(null);
 
         mAppEngineAuthenticator.authenticateAsync();
