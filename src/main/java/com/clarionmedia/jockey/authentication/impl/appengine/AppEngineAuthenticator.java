@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.clarionmedia.jockey.authentication.impl;
+package com.clarionmedia.jockey.authentication.impl.appengine;
 
 import android.accounts.*;
 import android.app.Activity;

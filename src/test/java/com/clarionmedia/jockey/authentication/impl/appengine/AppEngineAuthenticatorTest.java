@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.clarionmedia.jockey.authentication.impl;
+package com.clarionmedia.jockey.authentication.impl.appengine;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -24,6 +24,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import com.clarionmedia.jockey.authentication.OnAuthenticationListener;
+import com.clarionmedia.jockey.authentication.impl.appengine.AppEngineAuthenticator;
 import com.xtremelabs.robolectric.RobolectricTestRunner;
 import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.params.HttpParams;
