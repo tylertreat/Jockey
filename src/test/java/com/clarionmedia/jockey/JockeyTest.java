@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.clarionmedia.jockey.authentication.impl.appengine;
+package com.clarionmedia.jockey;
 
-import com.clarionmedia.jockey.Jockey;
 import com.clarionmedia.jockey.authentication.AuthenticationProvider;
 import com.xtremelabs.robolectric.RobolectricTestRunner;
 import org.junit.After;
