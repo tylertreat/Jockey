@@ -25,13 +25,17 @@ public class Jockey {
 
     private static List<AuthenticationProvider> sAuthProviderRegistry = new ArrayList<AuthenticationProvider>();
 
-    public static <T extends AuthenticationProvider> T to(T provider) {
+    public static synchronized <T extends AuthenticationProvider> T to(T provider) {
         sAuthProviderRegistry.add(provider);
         return provider;
     }
 
-    public static List<AuthenticationProvider> getAuthProviderRegistry() {
-        return sAuthProviderRegistry;
+    public static synchronized List<AuthenticationProvider> getAuthProviderRegistry() {
+        return new ArrayList<AuthenticationProvider>(sAuthProviderRegistry);
+    }
+
+    public static synchronized void resetAuthProviderRegistry() {
+        sAuthProviderRegistry.clear();
     }
 
 }
